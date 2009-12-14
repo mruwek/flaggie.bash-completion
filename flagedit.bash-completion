@@ -1,0 +1,71 @@
+# FlagEdit Bash Shell Command Completion
+
+#
+# Retrieve PORTDIR/PORTDIR_OVERLAY location from user's make.conf or, if it
+# is not defined there, from make.globals.
+#
+# (copied from gentoo-bashcomp)
+#
+_portdir()
+{
+    (
+    source /etc/make.globals 2>/dev/null
+    source /etc/make.conf 2>/dev/null
+
+    echo ${PORTDIR}
+    if [[ $1 == '-o' ]] ; then
+        echo ${PORTDIR_OVERLAY}
+    fi
+    )
+}
+
+#
+# This function completes package names.
+#
+# (some parts inspired by gentoo-bashcomp)
+#
+_pkgname()
+{
+    local cur portdir
+    cur="$1"
+    portdir="/usr/portage"
+    # Ignore '=' at the beginning of the current completion
+    [[ ${cur:1:1} == "=" ]] && cur=${cur:2}
+    [[ ${cur:0:1} == "=" ]] && cur=${cur:1}
+
+    # Package name
+    if [[ $cur == */* ]]; then
+        COMPREPLY=($(builtin cd ${portdir}; compgen -X "*metadata.xml" -W "$(compgen -G "$cur*" )" -- $cur))
+    else
+        COMPREPLY=($(builtin cd ${portdir}; compgen -W "$(compgen -X "!*-*" -S '/' -G "$cur*")" -- $cur))
+    fi
+    # Check if we just have finished completing the category.
+    if [[ ${#COMPREPLY[@]} -eq 1 ]]; then
+        COMPREPLY=($(builtin cd ${portdir}; compgen -W "$(compgen -G "$COMPREPLY*")" -- $cur))
+    fi
+}
+
+#
+# Main completion function for flagedit
+#
+
+_flagedit()
+{
+    local cur mode portdir use atom
+    portdir=$(_portdir)
+    COMPREPLY=()
+    prev="$3"
+    cur="$2"
+    atom="`qatom $prev | sed -e 's/=//;s/^\([a-z]*-[a-z]*\) \([a-zA-Z1-9-]*\).*/\1\/\2/'`"
+    use="`eix $atom 2>&1 | awk '/{.+}/{print $0}' | sed -e 's/.*{\(.*\)}/\1/;s/linguas_[a-zA-Z_]\{2,5\}//g'`"
+
+    case "${prev}" in
+        flagedit)
+            _pkgname $cur
+        ;;
+        *)
+        COMPREPLY=($(compgen -W '$use' $cur))
+        ;;
+    esac
+}
+complete -F _flagedit flagedit
