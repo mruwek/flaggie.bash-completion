@@ -12,10 +12,10 @@ _portdir()
     source /etc/make.globals 2>/dev/null
     source /etc/make.conf 2>/dev/null
 
-    echo ${PORTDIR}
     if [[ $1 == '-o' ]] ; then
         echo ${PORTDIR_OVERLAY}
     fi
+    echo ${PORTDIR}
     )
 }
 
@@ -28,20 +28,41 @@ _pkgname()
 {
     local cur portdir
     cur="$1"
-    portdir="/usr/portage"
+    portdir=$(_portdir -o)
     # Ignore '=' at the beginning of the current completion
     [[ ${cur:1:1} == "=" ]] && cur=${cur:2}
     [[ ${cur:0:1} == "=" ]] && cur=${cur:1}
 
     # Package name
     if [[ $cur == */* ]]; then
-        COMPREPLY=($(builtin cd ${portdir}; compgen -X "*metadata.xml" -W "$(compgen -G "$cur*" )" -- $cur))
+        COMPREPLY=($(\
+            for pd in ${portdir}; do
+                builtin cd ${pd};
+                compgen -X "*metadata.xml" -W "$(compgen -G "$cur*" )" -- $cur;
+            done))
+    # Here we are looking for category
     else
-        COMPREPLY=($(builtin cd ${portdir}; compgen -W "$(compgen -X "!*-*" -S '/' -G "$cur*")" -- $cur))
+        # 1. Collect all the categories among ${portdir}
+        ww=$(\
+            for pd in ${portdir}; do
+                builtin cd ${pd};
+                compgen -X "!*-*" -S '/' -G "$cur*";
+            done)
+
+        # 2. Now ugly hack to delete duplicate categories
+        local w
+        for x in ${ww} ; do w="${x}\n${w}"; done
+        words=$(echo -e ${w} | sort -u)
+
+        COMPREPLY=($(compgen -W "$words" -- $cur))
     fi
     # Check if we just have finished completing the category.
-    if [[ ${#COMPREPLY[@]} -eq 1 ]]; then
-        COMPREPLY=($(builtin cd ${portdir}; compgen -W "$(compgen -G "$COMPREPLY*")" -- $cur))
+    if [[ ${#COMPREPLY[@]} == 1 ]]; then
+        COMPREPLY=($(\
+            for pd in ${portdir}; do
+                builtin cd ${pd};
+                compgen -W "$(compgen -G "$COMPREPLY*")" -- $cur*;
+            done))
     fi
 }
 
