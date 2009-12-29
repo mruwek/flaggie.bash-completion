@@ -24,7 +24,7 @@ _portdir()
 #
 # (some parts inspired by gentoo-bashcomp)
 #
-_pkgname()
+_flagedit_pkgname()
 {
     local cur portdir
     cur="$1"
@@ -82,7 +82,7 @@ _flagedit()
 
     case "${prev}" in
         flagedit)
-            _pkgname $cur
+            _flagedit_pkgname $cur
         ;;
         *)
         COMPREPLY=($(compgen -W '$use' $cur))
