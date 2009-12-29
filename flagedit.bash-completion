@@ -65,6 +65,40 @@ _flagedit_pkgname()
             done))
     fi
 }
+_flagedit_use(){
+    local cur prev portdir atom use
+    cur="$1"
+    pkg=${COMP_WORDS[1]}
+    portdir=$(_portdir -o)
+    atom=(`qatom "${pkg}"`)
+    if [[ ${atom[2]} == "(null)" ]]; then
+        iuse=$(\
+            for pd in ${portdir}; do
+                builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
+                for pkgcache in `ls | grep ${atom[1]}-[[:digit:]]`; do
+                    sed -n "11 p" $pkgcache | sed -e 's/linguas_.\{2,5\} //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                done
+            done)
+    else
+        if [[ ${atom[3]} == "(null)" ]]; then
+            iuse=$(\
+                for pd in ${portdir}; do
+                    builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
+                    pkgcache="${atom[1]}-${atom[2]}";
+                    sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                done)
+        else
+            iuse=$(\
+                for pd in ${portdir}; do
+                    builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
+                    pkgcache="${atom[1]}-${atom[2]}-${atom[3]}";
+                    sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                done)
+        fi
+    fi
+    COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
+
+}
 
 #
 # Main completion function for flagedit
@@ -77,15 +111,13 @@ _flagedit()
     COMPREPLY=()
     prev="$3"
     cur="$2"
-    atom="`qatom $prev | sed -e 's/=//;s/^\([a-z]*-[a-z]*\) \([a-zA-Z1-9-]*\).*/\1\/\2/'`"
-    use="`eix $atom 2>&1 | awk '/{.+}/{print $0}' | sed -e 's/.*{\(.*\)}/\1/;s/linguas_[a-zA-Z_]\{2,5\}//g'`"
 
     case "${prev}" in
         flagedit)
             _flagedit_pkgname $cur
         ;;
         *)
-        COMPREPLY=($(compgen -W '$use' $cur))
+            _flagedit_use $cur
         ;;
     esac
 }
