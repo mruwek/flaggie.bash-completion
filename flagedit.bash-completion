@@ -81,7 +81,7 @@ _flagedit_use(){
                 done
             done)
     else
-        if [[ ${atom[3]} == "(null)" ]]; then
+        if [[ ${atom[3]} == "" ]]; then
             iuse=$(\
                 for pd in ${portdir}; do
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
