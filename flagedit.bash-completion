@@ -66,8 +66,9 @@ _flagedit_pkgname()
     fi
 }
 _flagedit_use(){
-    local cur prev portdir atom use
-    cur="$1"
+    local mode cur prev portdir atom use
+    mode="$1"
+    cur="$2"
     pkg=${COMP_WORDS[1]}
     portdir=$(_portdir -o)
     atom=(`qatom "${pkg}"`)
@@ -96,7 +97,16 @@ _flagedit_use(){
                 done)
         fi
     fi
-    COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
+
+    if [[ $mode == "enable" ]]; then
+        iuse=`echo $iuse | sed -e 's/\(^\| \)/\1+/g'`;
+    elif [[ $mode == "disable" ]]; then
+        iuse=`echo $iuse | sed -e 's/\(^\| \)/\1-/g'`;
+    elif [[ $mode == "reset" ]]; then
+        iuse=`echo $iuse | sed -e 's/\(^\| \)/\1%/g'`;
+    fi
+
+    COMPREPLY=($(compgen -W "$iuse" -- "$cur"));
 
 }
 
@@ -117,7 +127,17 @@ _flagedit()
             _flagedit_pkgname $cur
         ;;
         *)
-            _flagedit_use $cur
+            case "${cur}" in
+                -*)
+                    _flagedit_use disable $cur
+                ;;
+                %*)
+                    _flagedit_use reset $cur
+                ;;
+                *)
+                    _flagedit_use enable $cur
+                ;;
+            esac
         ;;
     esac
 }
