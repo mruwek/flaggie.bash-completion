@@ -99,15 +99,22 @@ _flagedit_use(){
         fi
     fi
 
-    if [[ $mode == "enable" ]]; then
-        iuse=`echo $iuse | sed -e 's/\(^\| \)/\1+/g'`;
-    elif [[ $mode == "disable" ]]; then
-        iuse=`echo $iuse | sed -e 's/\(^\| \)/\1-/g'`;
-    elif [[ $mode == "reset" ]]; then
-        iuse=`echo $iuse | sed -e 's/\(^\| \)/\1%/g'`;
-    fi
+    if [[ -n "${iuse}" ]]; then
+        if [[ $mode == "enable" ]]; then
+            iuse=`echo $iuse | sed -e 's/\(^\| \)/\1+/g'`;
+        elif [[ $mode == "disable" ]]; then
+            iuse=`echo $iuse | sed -e 's/\(^\| \)/\1-/g'`;
+        elif [[ $mode == "reset" ]]; then
+            iuse=`echo $iuse | sed -e 's/\(^\| \)/\1%/g'`;
+        fi
 
-    COMPREPLY=($(compgen -W "$iuse" -- "$cur"));
+        COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
+        return
+
+    else
+        COMPREPLY=()
+        return
+    fi
 
 }
 
