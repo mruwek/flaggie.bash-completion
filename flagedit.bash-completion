@@ -70,6 +70,7 @@ _flagedit_use(){
     mode="$1"
     cur="$2"
     pkg=${COMP_WORDS[1]}
+    [[ ${pkg} == '=' ]] && pkg=${COMP_WORDS[2]}
     portdir=$(_portdir -o)
     atom=(`qatom "${pkg}"`)
     if [[ ${atom[2]} == "(null)" ]]; then
@@ -142,3 +143,5 @@ _flagedit()
     esac
 }
 complete -F _flagedit flagedit
+
+# vim: set ft=sh tw=80 sw=4 et :
