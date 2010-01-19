@@ -124,7 +124,7 @@ _flagedit()
 
     case "${prev}" in
         flagedit)
-            _flagedit_pkgname $cur
+            _pkgname -A $cur
         ;;
         *)
             case "${cur}" in
