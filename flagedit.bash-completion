@@ -8,14 +8,17 @@
 # (http://bitbucket.org/mruwek/bash-completion/) and place it in
 # /root/.bash_completion.d
 
-_flagedit_use(){
-    local mode cur prev portdir atom use
+_flagedit_use()
+{
+    local cur mode portdir pkg atom iuse
+
     mode="$1"
     cur="$2"
     pkg=${COMP_WORDS[1]}
     [[ ${pkg} == '=' ]] && pkg=${COMP_WORDS[2]}
     portdir=$(_portdir -o)
     atom=(`qatom "${pkg}"`)
+
     if [[ ${atom[2]} == "(null)" ]]; then
         iuse=$(\
             for pd in ${portdir}; do
@@ -58,8 +61,8 @@ _flagedit_use(){
         COMPREPLY=()
         return
     fi
-
 }
+
 
 #
 # Main completion function for flagedit
@@ -67,7 +70,8 @@ _flagedit_use(){
 
 _flagedit()
 {
-    local cur mode portdir use atom
+    local cur prev mode portdir use atom
+
     portdir=$(_portdir)
     COMPREPLY=()
     prev="$3"
