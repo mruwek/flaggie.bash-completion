@@ -81,6 +81,9 @@ _flagedit()
         flagedit)
             _pkgname -A $cur
         ;;
+        --)
+            return
+        ;;
         *)
             case "${cur}" in
                 -*)
