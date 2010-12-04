@@ -24,7 +24,7 @@ _flaggie_use()
             for pd in ${portdir}; do
                 builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                 for pkgcache in ${atom[1]}-[0-9]*; do
-                    sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    sed -n "9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/\(\s\)[-+]\|^[-+]/\1/g';
                 done
             done)
     else
@@ -33,14 +33,14 @@ _flaggie_use()
                 for pd in ${portdir}; do
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                     pkgcache="${atom[1]}-${atom[2]}";
-                    sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    sed -n "9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/\(\s\)[-+]\|^[-+]/\1/g';
                 done)
         else
             iuse=$(\
                 for pd in ${portdir}; do
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                     pkgcache="${atom[1]}-${atom[2]}-${atom[3]}";
-                    sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    sed -n "9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/\(\s\)[-+]\|^[-+]/\1/g';
                 done)
         fi
     fi
