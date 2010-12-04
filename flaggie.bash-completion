@@ -1,5 +1,5 @@
 #
-# FlagEdit Bash Shell Command Completion
+# Flaggie Bash Shell Command Completion
 #
 # this code depends on 'gentoo' completion file from gentoo-bashcomp, so be sure
 # to either install that package and then enable 'gentoo' via 'eselect':
@@ -8,7 +8,7 @@
 # (http://bitbucket.org/mruwek/bash-completion/) and place it in
 # /root/.bash_completion.d
 
-_flagedit_use()
+_flaggie_use()
 {
     local cur mode portdir pkg atom iuse
 
@@ -65,10 +65,10 @@ _flagedit_use()
 
 
 #
-# Main completion function for flagedit
+# Main completion function for flaggie
 #
 
-_flagedit()
+_flaggie()
 {
     local cur prev mode portdir use atom
 
@@ -78,7 +78,7 @@ _flagedit()
     cur="$2"
 
     case "${prev}" in
-        flagedit)
+        flaggie)
             _pkgname -A $cur
         ;;
         --)
@@ -87,18 +87,18 @@ _flagedit()
         *)
             case "${cur}" in
                 -*)
-                    _flagedit_use disable $cur
+                    _flaggie_use disable $cur
                 ;;
                 %*)
-                    _flagedit_use reset $cur
+                    _flaggie_use reset $cur
                 ;;
                 *)
-                    _flagedit_use enable $cur
+                    _flaggie_use enable $cur
                 ;;
             esac
         ;;
     esac
 }
-complete -F _flagedit flagedit
+complete -F _flaggie flaggie
 
 # vim: set ft=sh tw=80 sw=4 et :
