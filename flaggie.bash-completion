@@ -54,9 +54,14 @@ _flaggie_use()
             iuse=`echo $iuse | sed -e 's/\(^\| \)/\1%/g'`;
         elif [[ $mode == "status_print" ]]; then
             iuse=`echo $iuse | sed -e 's/^/\?/g;s/ / \?/g'`;
+            if [[ $cur == "i" ]]; then
+                COMPREPLY=($(compgen -W "$iuse" -- "?"))
+            fi
         fi
 
-        COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
+        if [[ $COMPREPLY == "" ]]; then
+            COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
+        fi
         return
 
     else
