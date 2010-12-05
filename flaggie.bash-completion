@@ -25,6 +25,8 @@ _flaggie_use()
         ns='kw::'
     elif [[ ${prev} == *use* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *use ]]; then
         ns='use::'
+    elif [[ ${prev} == *env* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *env ]]; then
+        ns='env::'
     else
         ns=''
     fi
@@ -40,8 +42,11 @@ _flaggie_use()
                         sed -n "9 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
                     elif [[ $ns == "use::" ]]; then
                         sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    elif [[ $ns == "env::" ]]; then
+                        ls /etc/portage/env/
                     else
                         sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                        ls /etc/portage/env/
                     fi
                 done
             done)
@@ -59,6 +64,7 @@ _flaggie_use()
                         sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
                     else
                         sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                        ls /etc/portage/env/
                     fi
                 done)
         else
@@ -74,6 +80,7 @@ _flaggie_use()
                         sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
                     else
                         sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                        ls /etc/portage/env/
                     fi
                 done)
         fi
