@@ -10,7 +10,7 @@
 
 _flaggie_use()
 {
-    local cur mode portdir pkg atom iuse
+    local cur mode portdir pkg atom iuse ns
 
     mode="$1"
     cur="$2"
@@ -19,12 +19,30 @@ _flaggie_use()
     portdir=$(_portdir -o)
     atom=(`qatom "${pkg}"`)
 
+    if [[ ${prev} == *lic* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *lic ]]; then
+        ns='lic::'
+    elif [[ ${prev} == *kw* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *kw ]]; then
+        ns='kw::'
+    elif [[ ${prev} == *use* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *use ]]; then
+        ns='use::'
+    else
+        ns=''
+    fi
+
     if [[ ${atom[2]} == "(null)" ]]; then
         iuse=$(\
             for pd in ${portdir}; do
                 builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                 for pkgcache in ${atom[1]}-[0-9]*; do
-                    sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    if [[ $ns == "lic::" ]]; then
+                        sed -n "7 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    elif [[ $ns == "kw::" ]]; then
+                        sed -n "9 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    elif [[ $ns == "use::" ]]; then
+                        sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    else
+                        sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    fi
                 done
             done)
     else
@@ -33,21 +51,37 @@ _flaggie_use()
                 for pd in ${portdir}; do
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                     pkgcache="${atom[1]}-${atom[2]}";
-                    sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    if [[ $ns == "lic::" ]]; then
+                        sed -n "7 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    elif [[ $ns == "kw::" ]]; then
+                        sed -n "9 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    elif [[ $ns == "use::" ]]; then
+                        sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    else
+                        sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    fi
                 done)
         else
             iuse=$(\
                 for pd in ${portdir}; do
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                     pkgcache="${atom[1]}-${atom[2]}-${atom[3]}";
-                    sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    if [[ $ns == "lic::" ]]; then
+                        sed -n "7 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    elif [[ $ns == "kw::" ]]; then
+                        sed -n "9 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    elif [[ $ns == "use::" ]]; then
+                        sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    else
+                        sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+                    fi
                 done)
         fi
     fi
 
-    if [[ -n "${iuse}" ]]; then
+    if [[ -n "${iuse}" && -z $ns ]]; then
         if [[ $mode == "enable" ]]; then
-            iuse=`echo $iuse | sed -e 's/\(^\| \)/\1+/g'`;
+            iuse=`echo $iuse | sed -e "s/\(^\| \)/\1+/g"`;
         elif [[ $mode == "disable" ]]; then
             iuse=`echo $iuse | sed -e 's/\(^\| \)/\1-/g'`;
         elif [[ $mode == "reset" ]]; then
@@ -64,6 +98,8 @@ _flaggie_use()
         fi
         return
 
+    elif [[ -n "${iuse}" && -n $ns ]]; then
+        COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
     else
         COMPREPLY=()
         return
