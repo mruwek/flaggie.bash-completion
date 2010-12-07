@@ -8,6 +8,26 @@
 # (http://bitbucket.org/mruwek/bash-completion/) and place it in
 # /root/.bash_completion.d
 
+__get_iuse()
+{
+    local pkgcache ns
+
+    pkgcache="$1"
+    ns="$2"
+
+    if [[ $ns == "lic::" ]]; then
+        sed -n "7 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+    elif [[ $ns == "kw::" ]]; then
+        sed -n "9 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+    elif [[ $ns == "use::" ]]; then
+        sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+    else
+        sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+        ls -F /etc/portage/env
+    fi
+}
+
+
 _flaggie_use()
 {
     local cur mode portdir pkg atom iuse ns
@@ -37,16 +57,7 @@ _flaggie_use()
             for pd in ${portdir}; do
                 builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                 for pkgcache in ${atom[1]}-[0-9]*; do
-                    if [[ $ns == "lic::" ]]; then
-                        sed -n "7 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                    elif [[ $ns == "kw::" ]]; then
-                        sed -n "9 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                    elif [[ $ns == "use::" ]]; then
-                        sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                    else
-                        sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                        ls -F /etc/portage/env/
-                    fi
+                    __get_iuse $pkgcache $ns
                 done
             done)
     else
@@ -55,32 +66,14 @@ _flaggie_use()
                 for pd in ${portdir}; do
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                     pkgcache="${atom[1]}-${atom[2]}";
-                    if [[ $ns == "lic::" ]]; then
-                        sed -n "7 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                    elif [[ $ns == "kw::" ]]; then
-                        sed -n "9 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                    elif [[ $ns == "use::" ]]; then
-                        sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                    else
-                        sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                        ls -F /etc/portage/env/
-                    fi
-                done)
+                    __get_iuse $pkgcache $ns
+r               done)
         else
             iuse=$(\
                 for pd in ${portdir}; do
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                     pkgcache="${atom[1]}-${atom[2]}-${atom[3]}";
-                    if [[ $ns == "lic::" ]]; then
-                        sed -n "7 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                    elif [[ $ns == "kw::" ]]; then
-                        sed -n "9 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                    elif [[ $ns == "use::" ]]; then
-                        sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                    else
-                        sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-                        ls -F /etc/portage/env/
-                    fi
+                    __get_iuse $pkgcache $ns
                 done)
         fi
     fi
