@@ -21,9 +21,13 @@ __get_iuse()
         sed -n "9 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
     elif [[ $ns == "use::" ]]; then
         sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
+    elif [[ $ns == "env::" ]]; then
+        find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
+        find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
     else
         sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-        ls -F /etc/portage/env
+        find /etc/portage/env/ -type f| sed -e 's:/etc/portage/env/::'
+        find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
     fi
 }
 
@@ -46,8 +50,7 @@ _flaggie_use()
     elif [[ ${prev} == *use* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *use ]]; then
         ns='use::'
     elif [[ ${prev} == *env* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *env ]]; then
-        builtin cd /etc/portage/env/
-        _filedir
+        ns='env::'
     else
         ns=''
     fi
