@@ -70,7 +70,7 @@ _flaggie_use()
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                     pkgcache="${atom[1]}-${atom[2]}";
                     __get_iuse $pkgcache $ns
-r               done)
+                done)
         else
             iuse=$(\
                 for pd in ${portdir}; do
