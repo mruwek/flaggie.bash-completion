@@ -128,7 +128,8 @@ _flaggie()
                 -*)
                     COMPREPLY=($(compgen -W "--quiet --strict --drop-ineffective
                     --sort-entries --sort-flags --sort --cleanup
-                    --drop-unmatched-pkgs --drop-unmatched-flags --destructive-cleanup" -- "$cur"))
+                    --drop-unmatched-pkgs --drop-unmatched-flags
+                    --destructive-cleanup --migrate-files" -- "$cur"))
                 ;;
                 *)
                     _pkgname -A $cur
