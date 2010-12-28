@@ -8,7 +8,7 @@
 # (http://bitbucket.org/mruwek/bash-completion/) and place it in
 # /root/.bash_completion.d
 
-__get_iuse()
+__get_flargs()
 {
     local pkgcache ns
 
@@ -32,7 +32,7 @@ __get_iuse()
 }
 
 
-_flaggie_use()
+__complete_flargs()
 {
     local cur mode portdir pkg atom iuse ns
 
@@ -60,7 +60,7 @@ _flaggie_use()
             for pd in ${portdir}; do
                 builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                 for pkgcache in ${atom[1]}-[0-9]*; do
-                    __get_iuse $pkgcache $ns
+                    __get_flargs $pkgcache $ns
                 done
             done)
     else
@@ -69,14 +69,14 @@ _flaggie_use()
                 for pd in ${portdir}; do
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                     pkgcache="${atom[1]}-${atom[2]}";
-                    __get_iuse $pkgcache $ns
-                done)
+                    __get_flargs $pkgcache $ns
+               done)
         else
             iuse=$(\
                 for pd in ${portdir}; do
                     builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
                     pkgcache="${atom[1]}-${atom[2]}-${atom[3]}";
-                    __get_iuse $pkgcache $ns
+                    __get_flargs $pkgcache $ns
                 done)
         fi
     fi
@@ -142,16 +142,16 @@ _flaggie()
         *)
             case "${cur}" in
                 -*)
-                    _flaggie_use disable $cur
+                    __complete_flargs disable $cur
                 ;;
                 %*)
-                    _flaggie_use reset $cur
+                    __complete_flargs reset $cur
                 ;;
                 "?"*)
-                    _flaggie_use status_print $cur
+                    __complete_flargs status_print $cur
                 ;;
                 *)
-                    _flaggie_use enable $cur
+                    __complete_flargs enable $cur
                 ;;
             esac
         ;;
