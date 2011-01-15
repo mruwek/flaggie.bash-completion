@@ -10,14 +10,22 @@
 
 __get_flargs_global() {
     ns="$1"
+    portdir=$(_portdir -o)
+
     if [[ $ns == "lic::" ]]; then
-        ls /usr/portage/licenses
-        cat /usr/portage/profiles/license_groups | sed -e '/^$\|^#/d'| awk -F ' ' '{print $1}'
+        for pd in ${portdir}; do
+            ls $pd/licenses 2>/dev/null
+            cat $pd/profiles/license_groups 2>/dev/null | sed -e '/^$\|^#/d'| awk -F ' ' '{print "@"$1}'
+        done
     elif [[ $ns == "kw::" ]]; then
-        cat /usr/portage/profiles/arch.list | sed -e '/^$\|^#/d;s/^\(.*\)/~\1\n\1/'
+        for pd in ${portdir}; do
+            cat $pd/profiles/arch.list 2>/dev/null | sed -e '/^$\|^#/d;s/^\(.*\)/~\1\n\1/'
+        done
     elif [[ $ns == "use::" ]]; then
-        sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' /usr/portage/profiles/use.desc
-        sed -n -e 's/^[^ ]\+:\([^ ]*\) - .*$/\1/p' /usr/portage/profiles/use.local.desc
+        for pd in ${portdir}; do
+            sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' $pd/profiles/use.desc 2>/dev/null
+            sed -n -e 's/^[^ ]\+:\([^ ]*\) - .*$/\1/p' $pd/profiles/use.local.desc 2>/dev/null
+        done
     elif [[ $ns == "env::" ]]; then
         find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
         find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
