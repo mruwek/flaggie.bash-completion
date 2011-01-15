@@ -125,7 +125,7 @@ _flaggie()
     case "${prev}" in
         flaggie)
             case "${cur}" in
-                -*)
+                --*)
                     COMPREPLY=($(compgen -W "--quiet --strict --drop-ineffective
                     --sort-entries --sort-flags --sort --cleanup
                     --drop-unmatched-pkgs --drop-unmatched-flags
@@ -141,6 +141,12 @@ _flaggie()
         ;;
         *)
             case "${cur}" in
+                --*)
+                    COMPREPLY=($(compgen -W "--quiet --strict --drop-ineffective
+                    --sort-entries --sort-flags --sort --cleanup
+                    --drop-unmatched-pkgs --drop-unmatched-flags
+                    --destructive-cleanup --migrate-files" -- "$cur"))
+                ;;
                 -*)
                     __complete_flargs disable $cur
                 ;;
