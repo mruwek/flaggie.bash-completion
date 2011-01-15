@@ -16,7 +16,7 @@ __get_flargs_global() {
     elif [[ $ns == "kw::" ]]; then
         cat /usr/portage/profiles/arch.list | sed -e '/^$\|^#/d;s/^\(.*\)/~\1\n\1/'
     elif [[ $ns == "use::" ]]; then
-        sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' ${portdir}/profiles/use.desc
+        sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' /usr/portage/profiles/use.desc
         sed -n -e 's/^[^ ]\+:\([^ ]*\) - .*$/\1/p' /usr/portage/profiles/use.local.desc
     elif [[ $ns == "env::" ]]; then
         find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
