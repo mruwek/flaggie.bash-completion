@@ -29,6 +29,20 @@ __get_flargs_global() {
     elif [[ $ns == "env::" ]]; then
         find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
         find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+    else
+        for pd in ${portdir}; do
+            ls $pd/licenses 2>/dev/null
+            cat $pd/profiles/license_groups 2>/dev/null | sed -e '/^$\|^#/d'| awk -F ' ' '{print "@"$1}'
+        done
+        for pd in ${portdir}; do
+            cat $pd/profiles/arch.list 2>/dev/null | sed -e '/^$\|^#/d;s/^\(.*\)/~\1\n\1/'
+        done
+        for pd in ${portdir}; do
+            sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' $pd/profiles/use.desc 2>/dev/null
+            sed -n -e 's/^[^ ]\+:\([^ ]*\) - .*$/\1/p' $pd/profiles/use.local.desc 2>/dev/null
+        done
+        find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
+        find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
     fi
 }
 __get_flargs()
@@ -55,7 +69,8 @@ __get_flargs()
 }
 
 __complete_flargs_global() {
-    cur="$1"
+    mode="$1"
+    cur="$2"
 
     if [[ ${prev} == *lic* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *lic ]]; then
         ns='lic::'
@@ -71,7 +86,31 @@ __complete_flargs_global() {
 
     iuse=$(__get_flargs_global $ns)
 
-    COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
+    if [[ -n "${iuse}" && -z $ns ]]; then
+        if [[ $mode == "enable" ]]; then
+            iuse=`echo $iuse | sed -e "s/\(^\| \)/\1+/g"`;
+        elif [[ $mode == "disable" ]]; then
+            iuse=`echo $iuse | sed -e 's/\(^\| \)/\1-/g'`;
+        elif [[ $mode == "reset" ]]; then
+            iuse=`echo $iuse | sed -e 's/\(^\| \)/\1%/g'`;
+        elif [[ $mode == "status_print" ]]; then
+            iuse=`echo $iuse | sed -e 's/^/\?/g;s/ / \?/g'`;
+            if [[ $cur == "i" ]]; then
+                COMPREPLY=($(compgen -W "$iuse" -- "?"))
+            fi
+        fi
+
+        if [[ $COMPREPLY == "" ]]; then
+            COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
+        fi
+        return
+
+    elif [[ -n "${iuse}" && -n $ns ]]; then
+        COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
+    else
+        COMPREPLY=()
+        return
+    fi
 
 }
 
@@ -174,6 +213,18 @@ _flaggie()
                     --drop-unmatched-pkgs --drop-unmatched-flags
                     --destructive-cleanup --migrate-files" -- "$cur"))
                 ;;
+                -*)
+                    __complete_flargs_global disable $cur
+                ;;
+                %*)
+                    __complete_flargs_global reset $cur
+                ;;
+                "?"*)
+                    __complete_flargs_global status_print $cur
+                ;;
+                +*)
+                    __complete_flargs_global enable $cur
+                ;;
                 *)
                     _pkgname -A $cur
                 ;;
@@ -184,9 +235,41 @@ _flaggie()
         ;;
         @(+|-|%|"?"|::)*)
             if [[ ${COMP_WORDS[1]} == *-*/* ]]; then
-                __complete_flargs enable $cur
+                case "${cur}" in
+                    -*)
+                        __complete_flargs disable $cur
+                    ;;
+                    %*)
+                        __complete_flargs reset $cur
+                    ;;
+                    "?"*)
+                        __complete_flargs status_print $cur
+                    ;;
+                    +*)
+                        __complete_flargs enable $cur
+                    ;;
+                    *)
+                        __complete_flargs enable $cur
+                    ;;
+                esac
             else
-                __complete_flargs_global $cur
+                case "${cur}" in
+                    -*)
+                        __complete_flargs_global disable $cur
+                    ;;
+                    %*)
+                        __complete_flargs_global reset $cur
+                    ;;
+                    "?"*)
+                        __complete_flargs_global status_print $cur
+                    ;;
+                    +*)
+                        __complete_flargs_global enable $cur
+                    ;;
+                    *)
+                        __complete_flargs_global enable $cur
+                    ;;
+                esac
             fi
         ;;
         *)
