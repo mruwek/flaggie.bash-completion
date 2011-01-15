@@ -8,6 +8,21 @@
 # (http://bitbucket.org/mruwek/bash-completion/) and place it in
 # /root/.bash_completion.d
 
+__get_flargs_global() {
+    ns="$1"
+    if [[ $ns == "lic::" ]]; then
+        ls /usr/portage/licenses
+        cat /usr/portage/profiles/license_groups | sed -e '/^$\|^#/d'| awk -F ' ' '{print $1}'
+    elif [[ $ns == "kw::" ]]; then
+        cat /usr/portage/profiles/arch.list | sed -e '/^$\|^#/d;s/^\(.*\)/~\1\n\1/'
+    elif [[ $ns == "use::" ]]; then
+        sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' ${portdir}/profiles/use.desc
+        sed -n -e 's/^[^ ]\+:\([^ ]*\) - .*$/\1/p' /usr/portage/profiles/use.local.desc
+    elif [[ $ns == "env::" ]]; then
+        find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
+        find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+    fi
+}
 __get_flargs()
 {
     local pkgcache ns
@@ -31,6 +46,26 @@ __get_flargs()
     fi
 }
 
+__complete_flargs_global() {
+    cur="$1"
+
+    if [[ ${prev} == *lic* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *lic ]]; then
+        ns='lic::'
+    elif [[ ${prev} == *kw* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *kw ]]; then
+        ns='kw::'
+    elif [[ ${prev} == *use* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *use ]]; then
+        ns='use::'
+    elif [[ ${prev} == *env* || ${prev} == :: && ${COMP_WORDS[$COMP_CWORD-2]} == *env ]]; then
+        ns='env::'
+    else
+        ns=''
+    fi
+
+    iuse=$(__get_flargs_global $ns)
+
+    COMPREPLY=($(compgen -W "$iuse" -- "$cur"))
+
+}
 
 __complete_flargs()
 {
@@ -139,6 +174,13 @@ _flaggie()
         --)
             return
         ;;
+        @(+|-|%|"?"|::)*)
+            if [[ ${COMP_WORDS[1]} == *-*/* ]]; then
+                __complete_flargs enable $cur
+            else
+                __complete_flargs_global $cur
+            fi
+        ;;
         *)
             case "${cur}" in
                 --*)
@@ -155,6 +197,9 @@ _flaggie()
                 ;;
                 "?"*)
                     __complete_flargs status_print $cur
+                ;;
+                +*)
+                    __complete_flargs enable $cur
                 ;;
                 *)
                     __complete_flargs enable $cur
