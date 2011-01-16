@@ -24,7 +24,6 @@ __get_flargs_global() {
     elif [[ $ns == "use::" ]]; then
         for pd in ${portdir}; do
             sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' $pd/profiles/use.desc 2>/dev/null
-            sed -n -e 's/^[^ ]\+:\([^ ]*\) - .*$/\1/p' $pd/profiles/use.local.desc 2>/dev/null
         done
     elif [[ $ns == "env::" ]]; then
         find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
@@ -39,7 +38,6 @@ __get_flargs_global() {
         done
         for pd in ${portdir}; do
             sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' $pd/profiles/use.desc 2>/dev/null
-            sed -n -e 's/^[^ ]\+:\([^ ]*\) - .*$/\1/p' $pd/profiles/use.local.desc 2>/dev/null
         done
         find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
         find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
