@@ -114,14 +114,30 @@ __complete_flargs_global() {
 
 }
 
+__find_pkg() {
+
+    if [[ ${COMP_WORDS[@]} == *-*/* ]]; then
+        x=0
+        for string in ${COMP_WORDS[@]}; do
+            if [[ $string == *-*/* ]]; then
+                break
+            else
+                let x++
+            fi
+        done
+        echo $x
+    fi
+
+}
+
 __complete_flargs()
 {
     local cur mode portdir pkg atom iuse ns
 
     mode="$1"
     cur="$2"
-    pkg=${COMP_WORDS[1]}
-    [[ ${pkg} == '=' ]] && pkg=${COMP_WORDS[2]}
+    pkg_pos=$(__find_pkg)
+    pkg=${COMP_WORDS[$pkg_pos]}
     portdir=$(_portdir -o)
     atom=(`qatom "${pkg}"`)
 
@@ -234,7 +250,7 @@ _flaggie()
             return
         ;;
         @(+|-|%|"?"|::)*)
-            if [[ ${COMP_WORDS[1]} == *-*/* ]]; then
+            if [[ ${COMP_WORDS[@]} == *-*/* ]]; then
                 case "${cur}" in
                     -*)
                         __complete_flargs disable $cur
