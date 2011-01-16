@@ -221,7 +221,7 @@ _flaggie()
     cur="$2"
 
     case "${prev}" in
-        flaggie)
+        @(flaggie|--*))
             case "${cur}" in
                 --*)
                     COMPREPLY=($(compgen -W "--quiet --strict --drop-ineffective
