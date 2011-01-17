@@ -151,7 +151,7 @@ __complete_flargs()
         ns=''
     fi
 
-    if [[ ${atom[2]} == "(null)" ]]; then
+    if [[ ${atom[2]} == "(null)" || ${atom[1]} == *${atom[2]} ]]; then
         iuse=$(\
             for pd in ${portdir}; do
                 builtin cd ${pd}/metadata/cache/${atom[0]} 2>/dev/null;
