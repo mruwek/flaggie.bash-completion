@@ -26,8 +26,10 @@ __get_flargs_global() {
             sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' $pd/profiles/use.desc 2>/dev/null
         done
     elif [[ $ns == "env::" ]]; then
-        find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
-        find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+        if [[ -d /etc/portage/env ]]; then
+            find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
+            find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+        fi
     else
         for pd in ${portdir}; do
             ls $pd/licenses 2>/dev/null
@@ -39,8 +41,10 @@ __get_flargs_global() {
         for pd in ${portdir}; do
             sed -n -e 's/^\([^ ]\+\) - .*$/\1/p' $pd/profiles/use.desc 2>/dev/null
         done
-        find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
-        find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+        if [[ -d /etc/portage/env ]]; then
+            find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
+            find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+        fi
     fi
 }
 __get_flargs()
@@ -57,12 +61,16 @@ __get_flargs()
     elif [[ $ns == "use::" ]]; then
         sed -n "11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
     elif [[ $ns == "env::" ]]; then
-        find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
-        find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+        if [[ -d /etc/portage/env ]]; then
+            find /etc/portage/env/ -type f | sed -e 's:/etc/portage/env/::'
+            find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+        fi
     else
         sed -n "7 p;9 p;11 p" $pkgcache 2>/dev/null | sed -e 's/linguas_.\{2,5\} //g;s/^|| ( \(.*\) )/\1/g;s/-\* //g;s/\(\s\)[-+]\|^[-+]/\1/g';
-        find /etc/portage/env/ -type f| sed -e 's:/etc/portage/env/::'
-        find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+        if [[ -d /etc/portage/env ]]; then
+            find /etc/portage/env/ -type f| sed -e 's:/etc/portage/env/::'
+            find /etc/portage/env/ -type d | sed -e '1d;s:/etc/portage/env/\(.*\):\1/:'
+        fi
     fi
 }
 
